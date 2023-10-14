@@ -5,10 +5,13 @@ import Signup from "./pages/Signup";
 import Navbar from "./components/Navbar";
 import { useAuthContext } from "./hooks/useAuthContext";
 import BookDetailsModal from "./pages/BookDetails";
-import SignupAdmin from "./pages/SignupAdmin";
+import BookReader from "./pages/BookReader";
 
 function App() {
   const { user } = useAuthContext();
+
+  // Check if the user is logged in and has the role of "admin"
+  const isAdmin = user && user.role === "admin";
 
   return (
     <div className='App'>
@@ -27,11 +30,12 @@ function App() {
             path='/signup'
             element={!user ? <Signup /> : <Navigate to='/' />}
           />
-          <Route
-            path='/adminsignup'
-            element={!user ? <SignupAdmin /> : <Navigate to='/' />}
-          />
-          <Route path='/books' element={<BookDetailsModal />} />
+          {/* Conditionally render BookDetailsModal only if user is admin */}
+          {isAdmin ? (
+            <Route path='/books' element={<BookDetailsModal />} />
+          ) : (
+            <Route path='/readbooks' element={<BookReader />} />
+          )}
         </Routes>
       </div>
     </div>
