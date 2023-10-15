@@ -27,7 +27,11 @@ const WorkoutDetails = ({ workout }) => {
   return (
     <div className='workout-details'>
       <h4>{workout.title}</h4>
-      <img src={`/uploads/${workout.picture}`} alt='Workout daily' />
+      <img
+        src={`/uploads/images/${workout.picture}`}
+        alt='Workout daily'
+        style={{ height: 50, weight: 100 }}
+      />
       <p>
         <strong>Load (kg): </strong>
         {workout.load}
@@ -39,6 +43,13 @@ const WorkoutDetails = ({ workout }) => {
       <p>
         {formatDistanceToNow(new Date(workout.createdAt), { addSuffix: true })}
       </p>
+      <iframe
+        title='PDF Viewer'
+        src={`/uploads/pdfs/${workout.pdf}`} // Update this path based on your backend route
+        width='50%'
+        height='300'>
+        Your browser does not support iframes.
+      </iframe>
       <span className='material-symbols-outlined' onClick={handleClick}>
         delete
       </span>

@@ -11,10 +11,15 @@ const WorkoutForm = () => {
   const [reps, setReps] = useState("");
   const [error, setError] = useState(null);
   const [picture, setPicture] = useState(null);
+  const [pdf, setPdf] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
 
   const handleFileChange = (e) => {
     setPicture(e.target.files[0]);
+  };
+
+  const handlePDFChange = (e) => {
+    setPdf(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
@@ -30,6 +35,7 @@ const WorkoutForm = () => {
     formData.append("load", load);
     formData.append("reps", reps);
     formData.append("picture", picture); // Make sure "picture" is set to the file data
+    formData.append("pdf", pdf); // Make sure "pdf" is set to the file data
 
     const response = await fetch("/api/workouts", {
       method: "POST",
@@ -49,8 +55,16 @@ const WorkoutForm = () => {
       setLoad("");
       setReps("");
       setPicture(null);
+      setPdf(null);
       setError(null);
       setEmptyFields([]);
+
+      // Reset the file input value to "choisir un fichier"
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) {
+        fileInput.value = ""; // Reset the input value
+      }
+
       dispatch({ type: "CREATE_WORKOUT", payload: json });
     }
   };
@@ -94,6 +108,13 @@ const WorkoutForm = () => {
         onChange={handleFileChange}
       />
 
+      <label>Upload PDF:</label>
+      <input
+        type='file'
+        accept='application/pdf'
+        name='pdf'
+        onChange={handlePDFChange}
+      />
       <button>Add Workout</button>
       {error && <div className='error'>{error}</div>}
     </form>
