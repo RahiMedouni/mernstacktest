@@ -11,7 +11,7 @@ const WorkoutForm = () => {
   const [reps, setReps] = useState("");
   const [error, setError] = useState(null);
   const [picture, setPicture] = useState(null);
-  const [pdf, setPdf] = useState(null);
+  const [pdf, setPDF] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
 
   const handleFileChange = (e) => {
@@ -19,7 +19,7 @@ const WorkoutForm = () => {
   };
 
   const handlePDFChange = (e) => {
-    setPdf(e.target.files[0]);
+    setPDF(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
@@ -34,37 +34,51 @@ const WorkoutForm = () => {
     formData.append("title", title);
     formData.append("load", load);
     formData.append("reps", reps);
-    formData.append("picture", picture); // Make sure "picture" is set to the file data
-    formData.append("pdf", pdf); // Make sure "pdf" is set to the file data
+    formData.append("picture", picture);
+    formData.append("pdf", pdf);
+
+    // Initialize emptyFields as an empty array
+    let updatedEmptyFields = [];
+
+    // Check for empty fields including PDF
+    if (!title) {
+      updatedEmptyFields.push("title");
+    }
+    if (!load) {
+      updatedEmptyFields.push("load");
+    }
+    if (!reps) {
+      updatedEmptyFields.push("reps");
+    }
+    if (!picture) {
+      updatedEmptyFields.push("picture");
+    }
+    if (!pdf) {
+      updatedEmptyFields.push("pdf");
+    }
+
+    setEmptyFields(updatedEmptyFields);
 
     const response = await fetch("/api/workouts", {
       method: "POST",
-      body: formData, // Send the FormData object
+      body: formData,
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
     });
-    const json = await response.json();
 
-    if (!response.ok) {
-      setError(json.error);
-      setEmptyFields(json.emptyFields);
-    }
-    if (response.ok) {
+    if (response.status === 400) {
+      const data = await response.json();
+      setError(data.error);
+    } else if (response.status === 200) {
+      const json = await response.json();
       setTitle("");
       setLoad("");
       setReps("");
       setPicture(null);
-      setPdf(null);
+      setPDF(null);
       setError(null);
       setEmptyFields([]);
-
-      // Reset the file input value to "choisir un fichier"
-      const fileInput = document.querySelector('input[type="file"]');
-      if (fileInput) {
-        fileInput.value = ""; // Reset the input value
-      }
-
       dispatch({ type: "CREATE_WORKOUT", payload: json });
     }
   };
@@ -115,6 +129,7 @@ const WorkoutForm = () => {
         name='pdf'
         onChange={handlePDFChange}
       />
+
       <button>Add Workout</button>
       {error && <div className='error'>{error}</div>}
     </form>

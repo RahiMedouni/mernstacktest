@@ -11,16 +11,19 @@ const WorkoutDetails = ({ workout }) => {
       return;
     }
 
-    const response = await fetch("/api/workouts/" + workout._id, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
-    const json = await response.json();
+    try {
+      const response = await fetch(`/api/workouts/${workout._id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
 
-    if (response.ok) {
-      dispatch({ type: "DELETE_WORKOUT", payload: json });
+      if (response.ok) {
+        dispatch({ type: "DELETE_WORKOUT", payload: workout._id });
+      }
+    } catch (error) {
+      console.error("Delete workout error:", error);
     }
   };
 
@@ -28,24 +31,22 @@ const WorkoutDetails = ({ workout }) => {
     <div className='workout-details'>
       <h4>{workout.title}</h4>
       <img
-        src={`/uploads/images/${workout.picture}`}
+        src={`/uploads/${workout.picture}`}
         alt='Workout daily'
-        style={{ height: 50, weight: 100 }}
+        style={{ height: 50, width: 100 }}
       />
       <p>
-        <strong>Load (kg): </strong>
-        {workout.load}
+        <strong>Load (kg):</strong> {workout.load}
       </p>
       <p>
-        <strong>Reps: </strong>
-        {workout.reps}
+        <strong>Reps:</strong> {workout.reps}
       </p>
       <p>
         {formatDistanceToNow(new Date(workout.createdAt), { addSuffix: true })}
       </p>
       <iframe
         title='PDF Viewer'
-        src={`/uploads/pdfs/${workout.pdf}`} // Update this path based on your backend route
+        src={`/uploads/${workout.pdf}`}
         width='50%'
         height='300'>
         Your browser does not support iframes.
